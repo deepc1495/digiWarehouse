@@ -1,15 +1,28 @@
 import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import colorConstant from '../../constant/colorConstant'
 import { Image } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Button from '../../Component/Button'
+import DropDownPicker from 'react-native-dropdown-picker'
 const NotificationScreen = (props) => {
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(null);
+    const [items, setItems] = useState([
+        { label: "All", value: "all" },
+        { label: "Chat", value: "chat" },
+        { label: "Booking Status", value: "booking_status" },
+    ]);
     return (
         <SafeAreaView style={styles.mainContainer}>
             <ScrollView style={styles.scrollContainer}>
-                <View>
-                    <View style={styles.container1}>
+                <View style={{  width: '90%',
+        flexDirection: 'row',
+        alignSelf: 'center',
+        justifyContent:'space-between',
+        // marginTop: '5%',
+        alignItems: 'center',}}>
+                    <View style={[styles.container1,{flex:1}]}>
                         <TouchableOpacity
                             style={styles.container1Touchable}
                             onPress={() => {
@@ -25,12 +38,26 @@ const NotificationScreen = (props) => {
                             Notification
                         </Text>
                     </View>
-                    <View>
-
+                    <View style={{flex:1,width:'100%'}}>
+                        <View style={styles.dropdownContainer}>
+                            <DropDownPicker
+                                open={open}
+                                value={value}
+                                items={items}
+                                setOpen={setOpen}
+                                setValue={setValue}
+                                setItems={setItems}
+                                placeholder="All"
+                                style={styles.dropdown}
+                                arrowIconStyle={{ tintColor: "rgba(25, 30, 59, 0.30)" }} // Set dropdown icon color to red
+                                dropDownContainerStyle={styles.dropdownList}
+                                textStyle={styles.dropdownText}
+                            />
+                        </View>
                     </View>
                 </View>
 
-                <View style={{ width: '90%', alignSelf: 'center' }}>
+                <View style={{ width: '90%', alignSelf: 'center',zIndex:-1 }}>
                     {[{ title: 'Enquiry 1', title2: "Dubai Warehouse", isUser: false },
                     { title: 'Devyani Shinde', isUser: true }
                     ].map((v, i) => {
@@ -103,10 +130,10 @@ const styles = StyleSheet.create({
     },
     scrollContainer: { flex: 1, backgroundColor: colorConstant.white },
     container1: {
-        width: '90%',
+        // width: '90%',
         flexDirection: 'row',
         alignSelf: 'center',
-        marginTop: '5%',
+        // marginTop: '5%',
         alignItems: 'center',
     },
     container1Touchable: {
@@ -154,7 +181,28 @@ const styles = StyleSheet.create({
     touchableText: {
         fontSize: 16,
         color: 'rgba(25, 30, 59, 0.70)',
-        textAlign:'center'
+        textAlign: 'center'
 
-    }
+    },
+    dropdownContainer: {
+        // marginHorizontal: 15,
+        marginVertical: 10,
+        zIndex: 1,
+        width: '100%',
+        marginBottom: 20,
+        zIndex:999
+    },
+    dropdown: {
+        borderColor: "rgba(25, 30, 59, 0.30)",
+        borderRadius: 8,
+        // backgroundColor:'red',
+        
+    },
+    dropdownList: {
+        borderColor: "rgba(25, 30, 59, 0.30)",
+    },
+    dropdownText: {
+        fontSize: 16,
+
+    },
 })

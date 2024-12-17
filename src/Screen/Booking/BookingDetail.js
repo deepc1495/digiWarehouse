@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     ScrollView,
     Image,
+    Platform,
 } from "react-native";
 import colorConstant from "../../constant/colorConstant";
 import appConstant from "../../constant/appConstant";
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#F9FAFB",
-        paddingTop: 40,
+        paddingTop: Platform.OS === 'ios'? 40:0,
     },
     container1: {
         width: '90%',

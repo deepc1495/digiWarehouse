@@ -9,4 +9,5 @@ export default {
   BookingHistory:"BookingHistory",
   BookingDetails:"BookingDetails",
   ManageBooking:"ManageBooking",
+  ChatScreen:"ChatScreen",
 };

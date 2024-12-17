@@ -11,10 +11,19 @@ import {
 import colorConstant from "../../constant/colorConstant";
 import appConstant from "../../constant/appConstant";
 // import { Picker } from "@react-native-picker/picker";
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const BookingHistory = (props) => {
   const [selectedTab, setSelectedTab] = useState("Completed Booking");
   const [selectedFilter, setSelectedFilter] = useState("All");
+
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    { label: "All", value: "all" },
+    { label: "Confirmed", value: "confirmed" },
+    { label: "Under Process", value: "under_process" },
+  ]);
 
   const bookings = [
     {
@@ -124,10 +133,26 @@ const BookingHistory = (props) => {
         </Picker>
       </View> */}
 
+<View style={styles.dropdownContainer}>
+        <DropDownPicker
+          open={open}
+          value={value}
+          items={items}
+          setOpen={setOpen}
+          setValue={setValue}
+          setItems={setItems}
+          placeholder="All"
+          style={styles.dropdown}
+          arrowIconStyle={{ tintColor: "rgba(25, 30, 59, 0.30)" }} // Set dropdown icon color to red
+          dropDownContainerStyle={styles.dropdownList}
+          textStyle={styles.dropdownText}
+        />
+      </View>
+
       {/* Booking List */}
       <ScrollView style={styles.bookingList}>
         {bookings.map((booking) => (
-          <TouchableOpacity key={booking.id} style={styles.card} onPress={()=>{
+          <TouchableOpacity key={booking.id} style={styles.card} onPress={() => {
             props.navigation.navigate(appConstant.BookingDetails)
           }}>
             <Image
@@ -141,11 +166,11 @@ const BookingHistory = (props) => {
               <Text style={styles.bookingNo}>Booking no: {booking.bookingNo}</Text>
               <Text style={styles.name}>{booking.name}</Text>
               <Text style={styles.date}>
-                Start Date: <Text style={{fontWeight:'500'}}> {booking.startDate}</Text>
+                Start Date: <Text style={{ fontWeight: '500' }}> {booking.startDate}</Text>
               </Text>
               <Text style={styles.date}>
-                
-                End Date:  <Text style={{fontWeight:'500'}}> {booking.endDate}</Text>
+
+                End Date:  <Text style={{ fontWeight: '500' }}> {booking.endDate}</Text>
               </Text>
               <Text style={styles.date}>
                 Total amount: <Text style={styles.amount}>{booking.amount}</Text>
@@ -295,6 +320,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "#000",
+  },
+
+  dropdownContainer: {
+    marginHorizontal: 15,
+    marginVertical: 10,
+    zIndex: 1,
+    width:'50%',
+    marginBottom:20
+  },
+  dropdown: {
+    borderColor: "rgba(25, 30, 59, 0.30)",
+    borderRadius: 8,
+  },
+  dropdownList: {
+    borderColor: "rgba(25, 30, 59, 0.30)",
+  },
+  dropdownText: {
+    fontSize: 16,
+
   },
 });
 

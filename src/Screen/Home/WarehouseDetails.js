@@ -235,6 +235,12 @@ const WarehouseDetails = props => {
             />
             <Text style={styles.OfferText}>Fire alarms and extinguishers</Text>
           </View>
+          <TouchableOpacity style={styles.BookButton} onPress={() => {
+            props.navigation.navigate(appConstant.ChatScreen);
+
+          }}>
+            <Text style={styles.BookText}>Connect with Host</Text>
+          </TouchableOpacity>
 
           <Text style={styles.reviewText}>Reviews (272)</Text>
           <Text style={styles.reviewText1}>Overall rating</Text>

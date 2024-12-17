@@ -13,6 +13,7 @@ import EnquiryList from '../Screen/Enquiry/EnquiryList';
 import BookingHistory from '../Screen/Booking/BookingHistory';
 import BookingDetails from '../Screen/Booking/BookingDetail';
 import ManageBooking from '../Screen/Booking/ManageBooking';
+import ChatScreen from '../Screen/Enquiry/chat';
 
 const HomeNavigation = props => {
   const Stack = createNativeStackNavigator();
@@ -53,6 +54,11 @@ const HomeNavigation = props => {
       <Stack.Screen
         name={appConstant.ManageBooking}
         component={ManageBooking}
+        options={{headerTintColor: '#ffffff', headerShown: false}}
+      />
+      <Stack.Screen
+        name={appConstant.ChatScreen}
+        component={ChatScreen}
         options={{headerTintColor: '#ffffff', headerShown: false}}
       />
     </Stack.Navigator>
