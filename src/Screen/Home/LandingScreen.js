@@ -10,17 +10,20 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
-import {TouchableOpacity} from 'react-native';
+import React, { useState } from 'react';
+import { TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import appConstant from '../../constant/appConstant';
 import colorConstant from '../../constant/colorConstant';
+import DatePicker from 'react-native-date-picker';
+import moment from 'moment';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const LandingScreen = props => {
   const [id, setId] = useState('0');
   const [modalVisible, setModalVisible] = useState(false);
   const catagories = [
-    {id: 1, name: 'Government', icon: require('../../Img/icon/government.png')},
+    { id: 1, name: 'Government', icon: require('../../Img/icon/government.png') },
     {
       id: 2,
       name: 'Distribution',
@@ -118,6 +121,22 @@ const LandingScreen = props => {
       location: 'Dubai',
     },
   ];
+
+  const [checkIn, setCheckIn] = useState(null)
+  const [checkOut, setCheckOut] = useState(null)
+  const [isopenCheckIn, setIsopenCheckIn] = useState(false)
+  const [isopenCheckOut, setIsopenCheckOut] = useState(false)
+
+  const [openCargoType, setOpenCargoType] = useState(false);
+  const [cargoType, setCargoType] = useState(null);
+  const [cargoTypeOption, setCargoTypeOption] = useState([
+
+    { label: 'Cargo Types', value: 'Cargo Types' },
+    { label: 'Container Cargo', value: 'Container Cargo' },
+    { label: 'Hazardous Cargo', value: 'Hazardous Cargo' }
+  ]);
+
+  console.log('checkIn', checkIn, 'checkOut', checkOut)
   return (
     <View style={styles.mainContainer}>
       <View style={styles.container}>
@@ -153,7 +172,7 @@ const LandingScreen = props => {
           horizontal
           data={catagories}
           keyExtractor={item => item}
-          renderItem={({item, index}) => (
+          renderItem={({ item, index }) => (
             <TouchableOpacity
               style={[
                 styles.filterButton,
@@ -174,7 +193,7 @@ const LandingScreen = props => {
                 <Text
                   style={[
                     styles.filterText,
-                    {color: index == id ? '#ffff' : '#000'},
+                    { color: index == id ? '#ffff' : '#000' },
                   ]}>
                   {item?.name}
                 </Text>
@@ -188,7 +207,7 @@ const LandingScreen = props => {
         data={warehouses}
         keyExtractor={item => item.id}
         numColumns={2}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
@@ -239,35 +258,92 @@ const LandingScreen = props => {
               placeholder=" Serach your destination..."
               style={[
                 styles.modaltextInput,
-                {marginTop: Platform.OS == 'ios' ? 5 : 0},
+                { marginTop: Platform.OS == 'ios' ? 5 : 0 },
               ]}></TextInput>
           </View>
           <View style={styles.modalSearchview}>
             <Text style={styles.modalsearchText}>Check In</Text>
-            <TextInput
-              placeholder="Add Dates"
-              style={[
-                styles.modaltextInput,
-                {marginTop: Platform.OS == 'ios' ? 5 : 0},
-              ]}></TextInput>
+            <TouchableOpacity onPress={() => { setIsopenCheckIn(true) }}>
+              <TextInput
+                editable={false}
+                placeholder="Add Dates"
+                value={checkIn ? moment(checkIn).format('DD/MM/YYYY') : null}
+                style={[
+                  styles.modaltextInput,
+                  { marginTop: Platform.OS == 'ios' ? 5 : 0 },
+                ]}></TextInput>
+            </TouchableOpacity>
+            <DatePicker
+              modal
+              mode='date'
+              open={isopenCheckIn}
+              date={checkIn ?? new Date()}
+              onConfirm={(date) => {
+                setIsopenCheckIn(false)
+                console.log('data', date)
+                setCheckIn(date)
+              }}
+              onCancel={() => {
+                setIsopenCheckIn(false)
+              }}
+            />
           </View>
           <View style={styles.modalSearchview}>
             <Text style={styles.modalsearchText}>Check Out</Text>
-            <TextInput
-              placeholder="Add Dates"
-              style={[
-                styles.modaltextInput,
-                {marginTop: Platform.OS == 'ios' ? 5 : 0},
-              ]}></TextInput>
+            <TouchableOpacity onPress={() => { setIsopenCheckOut(true) }}>
+
+
+              <TextInput
+                editable={false}
+                placeholder="Add Dates"
+                value={checkOut ? moment(checkOut).format('DD/MM/YYYY') : null}
+                style={[
+                  styles.modaltextInput,
+                  { marginTop: Platform.OS == 'ios' ? 5 : 0 },
+                ]}></TextInput>
+            </TouchableOpacity>
+            <DatePicker
+              modal
+              mode='date'
+              open={isopenCheckOut}
+              minimumDate={checkOut ?? new Date()}
+              date={checkOut ?? new Date()}
+              onConfirm={(date) => {
+                setIsopenCheckOut(false)
+                console.log('data', date)
+                setCheckOut(date)
+              }}
+              onCancel={() => {
+                setIsopenCheckOut(false)
+              }}
+            />
           </View>
           <View style={styles.modalSearchview}>
-            <Text style={styles.modalsearchText}>Cargo Type</Text>
-            <TextInput
+            <Text style={[styles.modalsearchText,{zIndex:99999}]}>Cargo Type</Text>
+            {/* <TextInput
               placeholder="Select cargo type"
               style={[
                 styles.modaltextInput,
-                {marginTop: Platform.OS == 'ios' ? 5 : 0},
-              ]}></TextInput>
+                { marginTop: Platform.OS == 'ios' ? 5 : 0 },
+              ]}></TextInput> */}
+              <View style={{height:30}}>
+
+            
+            <DropDownPicker
+              open={openCargoType}
+              value={cargoType}
+              items={cargoTypeOption}
+              setOpen={setOpenCargoType}
+              setValue={setCargoType}
+              // setItems={setItems}
+              placeholder='Cargo Types'
+              zIndex={9999}
+              style={{borderWidth:0,paddingLeft:0,height:33,backgroundColor:'#fff'}}
+              textStyle={{color:'gray'}}
+              maxHeight={'100%'}
+              containerStyle={{paddingTop:0,display:'flex',alignItems:'center',justifyContent:'center',paddingLeft:0,marginLeft:0}}
+            />
+              </View>
           </View>
 
           <TouchableOpacity
@@ -369,14 +445,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
   },
-  flhzview: {flexDirection: 'row'},
+  flhzview: { flexDirection: 'row' },
   imgicon: {
     width: 20,
     height: 20,
     resizeMode: 'contain',
     marginEnd: 10,
   },
-  filterText: {color: '#fff', fontWeight: '400'},
+  filterText: { color: '#fff', fontWeight: '400' },
   card: {
     flex: 1,
     margin: 10,
@@ -385,7 +461,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     elevation: 3,
   },
-  flinview: {width: '100%', height: 120},
+  flinview: { width: '100%', height: 120 },
   flinsubview: {
     width: 60,
     height: 30,
@@ -397,8 +473,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  flinsubvitext: {color: '#fff', fontSize: 10},
-  cardImage: {width: '100%', height: '100%'},
+  flinsubvitext: { color: '#fff', fontSize: 10 },
+  cardImage: { width: '100%', height: '100%' },
   cardTitle: {
     fontSize: 14,
     fontWeight: 'bold',
@@ -411,7 +487,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginVertical: 5,
   },
-  cardprview: {flexDirection: 'row', justifyContent: 'space-between'},
+  cardprview: { flexDirection: 'row', justifyContent: 'space-between' },
   cardPrice: {
     fontSize: 14,
     fontWeight: 'bold',
@@ -428,7 +504,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderRadius: 4,
   },
-  cardprimgicon: {width: 15, height: 15},
+  cardprimgicon: { width: 15, height: 15 },
   centeredView: {
     flex: 1,
     // justifyContent: 'center',
@@ -445,7 +521,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 15,
   },
-  modalsearchText: {fontSize: 16, color: colorConstant.textCOlor},
+  modalsearchText: { fontSize: 16, color: colorConstant.textCOlor },
   modaltextInput: {
     fontSize: 14,
     color: 'lightgray',
@@ -460,7 +536,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 15,
   },
-  modaltouchableText: {fontSize: 20, color: colorConstant.white},
+  modaltouchableText: { fontSize: 20, color: colorConstant.white },
   modalView: {
     margin: 20,
     backgroundColor: 'white',
