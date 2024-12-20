@@ -9,9 +9,12 @@ import {
   FlatList,
   SafeAreaView
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import colorConstant from '../../constant/colorConstant';
 import ImageConstant from '../../constant/ImageConstant';
+import { getExplore } from '../../Utility/api';
+import PageLoader from '../../Component/PageLoader';
+import { ImgUrl } from '../../Utility/request';
 
 const ExplorServices = () => {
   const locationData = [
@@ -43,6 +46,24 @@ const ExplorServices = () => {
       image: require('../../Img/toplocation/FUJAIRAH.png'),
     },
   ];
+  const [isPageLoader, setisPageLoader] = useState(true)
+
+  const [exploreData, setexploreData] = useState([])
+
+  useEffect(() => {
+    getExploreData()
+  }, [])
+
+const getExploreData = async () => {
+    const res = await getExplore()
+    if (res?.data) {
+      setexploreData(res?.data)
+    console.log('res',res.data)
+     
+    }
+    setisPageLoader(false)
+  }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView style={styles.scroll}>
@@ -61,6 +82,10 @@ const ExplorServices = () => {
         </ImageBackground>
 
         <View style={styles.container}>
+
+        
+
+          
           <ImageBackground
             source={ImageConstant.Climate}
             style={styles.imgBack}
@@ -125,12 +150,12 @@ const ExplorServices = () => {
 
           <FlatList
             horizontal
-            data={locationData}
+            data={exploreData?.emirates || []}
             renderItem={({item, index}) => {
               return (
                 <View
                   style={[styles.flatView, {marginLeft: index == 0 ? 0 : 20}]}>
-                  <Image source={item.image} style={styles.flimg} />
+                  <Image source={{uri:ImgUrl+item?.image}} style={styles.flimg} />
                   <View style={styles.flinview}>
                     <Text style={styles.nametext}>{item?.name}</Text>
                     <View style={styles.flinsubview}>
@@ -145,8 +170,12 @@ const ExplorServices = () => {
               );
             }}
           />
+
+
         </View>
       </ScrollView>
+      <PageLoader visible={isPageLoader}  />
+
     </SafeAreaView>
   );
 };

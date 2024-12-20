@@ -17,7 +17,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import ProgressBar from 'react-native-progress/Bar';
 import appConstant from '../../constant/appConstant';
 
-const WarehouseDetails = props => {
+const WarehouseDetails = ({navigation,route}) => {
+  const {id} = route.params
   const imageArray = [
     { id: 1, image: ImageConstant.homeImage },
     { id: 2, image: ImageConstant.homeImage },
@@ -32,7 +33,7 @@ const WarehouseDetails = props => {
           <TouchableOpacity
             style={styles.container1Touchable}
             onPress={() => {
-              props.navigation.goBack();
+              navigation.goBack();
             }}>
             <Image
               source={require('../../Img/icon/back.png')}
@@ -143,13 +144,13 @@ const WarehouseDetails = props => {
           <Text style={styles.CalCharge}>Includes taxes and charges</Text>
 
           <TouchableOpacity style={styles.AddButton} onPress={()=>{
-           props.navigation.navigate(appConstant.EnquiryList)
+           navigation.navigate(appConstant.EnquiryList)
           }}>
             <Text style={styles.AddText}>Add to wishlist</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.BookButton} onPress={() => {
-            props.navigation.navigate(appConstant.AdditionalServices);
+            navigation.navigate(appConstant.AdditionalServices);
 
           }}>
             <Text style={styles.BookText}>Book now</Text>
@@ -236,7 +237,7 @@ const WarehouseDetails = props => {
             <Text style={styles.OfferText}>Fire alarms and extinguishers</Text>
           </View>
           <TouchableOpacity style={styles.BookButton} onPress={() => {
-            props.navigation.navigate(appConstant.ChatScreen);
+            navigation.navigate(appConstant.ChatScreen);
 
           }}>
             <Text style={styles.BookText}>Connect with Host</Text>
