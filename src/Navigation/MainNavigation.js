@@ -7,6 +7,7 @@ import SignUpScreen from '../Screen/auth/SignUpScreen';
 import LandingScreen from '../Screen/Home/LandingScreen';
 import TabNavigation from './TabNavigation';
 import appConstant from '../constant/appConstant';
+import SignIn  from '../Screen/auth/Signin';
 
 const MainNavigation = props => {
   const Stack = createNativeStackNavigator();
@@ -14,7 +15,7 @@ const MainNavigation = props => {
     <Stack.Navigator initialRouteName="SignInScreen" screenOptions={{}}>
       <Stack.Screen
         name={appConstant.SignInScreen}
-        component={SignInScreen}
+        component={SignIn}
         options={{headerTintColor: '#ffffff', headerShown: false}}
       />
       <Stack.Screen

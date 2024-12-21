@@ -11,11 +11,35 @@ import InputField from '../../Component/InputField';
 import Button from '../../Component/Button';
 import appConstant from '../../constant/appConstant';
 import colorConstant from '../../constant/colorConstant';
+import Toast from 'react-native-toast-message';
+import { loginApi } from '../../Utility/api';
 
 
 const SignInScreen = props => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const onLogin = async()=>{
+    if(!email){
+      Toast.show({
+        type:'error',
+        text1:'Please Enter Valid Email'
+      })
+    }else if(!password){
+      Toast.show({
+        type:'error',
+        text1:'Please Enter Valid Password'
+      })
+    }else {
+      const data = {
+        email:email,
+        password:password
+      }
+
+      const res = await loginApi(data)
+      console.log('ress',res)
+    }
+  }
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.titleText}>

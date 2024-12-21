@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 
 const API_ENDPOINT = 'https://log-booking.finloge.com/api';
@@ -6,16 +7,18 @@ export const ImgMediaUrl = `https://log-manage.finloge.com/media/`
 const get = async (url, options = {}) => {
   return new Promise(async (resolve, reject) => {
     let baseURL = API_ENDPOINT + url;
-    let token = 'ca6b795b-9ff9-41b0-9e84-60a4ffe74ab0';
+    const token = await AsyncStorage.getItem('token');
+   console.log('token',token)
     try {
       console.log('url--', baseURL);
       let result = await fetch(baseURL, {
         ...options,
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`, // Add the Authorization header
           'Content-Type': 'application/json', // Optional: Add if required
-          ...(options.headers || {}), // Merge with existing headers if any
+          'Authorization':`${token}`,
+          ...(options.headers || {}),
+           // Merge with existing headers if any
         },
       });
       const response = await result.json();
@@ -30,6 +33,7 @@ const get = async (url, options = {}) => {
         });
       }
     } catch (error) {
+      console.log('testtttt',error)
       reject(error);
     }
   });
@@ -49,6 +53,30 @@ const post = async (url, data, method = 'POST') => {
         method: method,
         headers,
         body: data,
+      });
+      const result = await response.json();
+      if (result.status || result.success) {
+        resolve(result);
+      } else {
+        resolve(result)
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+const loginReq = async (url, data, method = 'POST') => {
+  return new Promise(async (resolve, reject) => {
+    let baseURL = url;
+    try {
+      const headers = {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      };
+      const response = await fetch(baseURL, {
+        method: method,
+        headers,
+        body: JSON.stringify(data),
       });
       const result = await response.json();
       if (result.status || result.success) {
@@ -120,5 +148,6 @@ export default {
   get,
   post,
   Delete,
-  payPostReq
+  payPostReq,
+  loginReq
 };

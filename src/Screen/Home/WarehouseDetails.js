@@ -9,13 +9,17 @@ import {
   TextInput,
   SafeAreaView
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import colorConstant from '../../constant/colorConstant';
 import { Rating, AirbnbRating } from 'react-native-ratings';
 import ImageConstant from '../../constant/ImageConstant';
 import LinearGradient from 'react-native-linear-gradient';
 import ProgressBar from 'react-native-progress/Bar';
 import appConstant from '../../constant/appConstant';
+import { getWareHouseDetails } from '../../Utility/api';
+import PageLoader from '../../Component/PageLoader';
+import { ImgMediaUrl, ImgUrl } from '../../Utility/request';
+import DatePicker from 'react-native-date-picker';
 
 const WarehouseDetails = ({navigation,route}) => {
   const {id} = route.params
@@ -26,6 +30,35 @@ const WarehouseDetails = ({navigation,route}) => {
     { id: 4, image: ImageConstant.homeImage },
     { id: 5, image: ImageConstant.homeImage },
   ];
+  console.log('idd',id)
+  const [isPageLoader, setisPageLoader] = useState(true)
+const [details, setDetails] = useState(null)
+const [selectedImg, setselectedImg] = useState(null)
+
+ const [checkIn, setCheckIn] = useState(null)
+  const [checkOut, setCheckOut] = useState(null)
+  const [isopenCheckIn, setIsopenCheckIn] = useState(false)
+  const [isopenCheckOut, setIsopenCheckOut] = useState(false)
+
+   useEffect(() => {
+    if(id){
+      getDetails()
+    }
+    }, [])
+  
+    const getDetails = async () => {
+      const res = await getWareHouseDetails(id)
+      if (res?.data?.warehouse) {
+        console.log('dataa',res?.data?.warehouse)
+        setDetails(res?.data?.warehouse)
+        setselectedImg(res?.data?.warehouse?.images?.[0])
+         }else{
+          setDetails(null)
+         }
+      setisPageLoader(false)
+  
+    }
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <ScrollView style={styles.scrollContainer}>
@@ -48,33 +81,38 @@ const WarehouseDetails = ({navigation,route}) => {
         </View>
         <View style={styles.container2}>
           <Text style={styles.container2Text1}>
-            Warehouse in sharjah - Premium Deal
+            {details?.name}
           </Text>
-          <Text style={styles.container2Text2}>
+          {/* <Text style={styles.container2Text2}>
             lorem Ipsum • lorem Ipsum • lorem Ipsum
-          </Text>
+          </Text> */}
 
           <View style={styles.subContainer}>
             <Rating style={{}} imageSize={20} />
             <Text style={styles.review}>272 Reviews</Text>
           </View>
 
-          <Image
-            source={ImageConstant.homeImage}
+          {selectedImg?.image && <Image
+            source={{uri:ImgMediaUrl+selectedImg?.image}}
             style={styles.con2img}
           // resizeMode="contain"
-          />
+          />}
 
           <FlatList
             horizontal
-            data={imageArray}
+            data={details?.images}
             renderItem={({ item, index }) => {
               return (
-                <Image
-                  source={item.image}
-                  style={[styles.flatimg, { marginLeft: index == 0 ? 0 : 15 }]}
-                // resizeMode="contain"
-                />
+                <TouchableOpacity onPress={()=>{
+                  setselectedImg(item)
+                }}>
+                  <Image
+                    source={{uri:ImgMediaUrl+item.image}}
+                    style={[styles.flatimg, { marginLeft: index == 0 ? 0 : 15 }]}
+                  // resizeMode="contain"
+                  />
+
+                </TouchableOpacity>
               );
             }}
             style={styles.flatlist}
@@ -87,8 +125,8 @@ const WarehouseDetails = ({navigation,route}) => {
               resizeMode="contain"
             />
             <View style={styles.location}>
-              <Text style={styles.loctext1}>Location & accessibility</Text>
-              <Text style={styles.loctext2}>Exact address</Text>
+              <Text style={styles.loctext1}>Location & Accessibility</Text>
+              <Text style={styles.loctext2}>{details?.warehouse_address_line1} {details?.warehouse_address_line2}</Text>
             </View>
           </View>
           <View style={styles.flView}>
@@ -98,7 +136,7 @@ const WarehouseDetails = ({navigation,route}) => {
               resizeMode="contain"
             />
             <View style={styles.location}>
-              <Text style={styles.loctext1}>Size & layout</Text>
+              <Text style={styles.loctext1}>Cargo Type</Text>
               <Text style={styles.loctext2}>Total square footage</Text>
             </View>
           </View>
@@ -116,11 +154,35 @@ const WarehouseDetails = ({navigation,route}) => {
           <View style={styles.line}></View>
           <View style={styles.TiView}>
             <Text style={styles.TiTitle}>Enter check in date</Text>
-            <TextInput placeholder="dd/mm/yyyy" style={styles.Titext} />
+            <TouchableOpacity onPress={() => { setIsopenCheckIn(true) }}>
+                          <TextInput
+                            editable={false}
+                            placeholder="Add Dates"
+                            value={checkIn ? moment(checkIn).format('DD/MM/YYYY') : null}
+                            style={[
+                              styles.modaltextInput,
+                              { marginTop: Platform.OS == 'ios' ? 5 : 0 },
+                            ]}></TextInput>
+                        </TouchableOpacity>
+                        <DatePicker
+                          modal
+                          mode='date'
+                          open={isopenCheckIn}
+                          date={checkIn ?? new Date()}
+                          onConfirm={(date) => {
+                            setIsopenCheckIn(false)
+                            console.log('data', date)
+                            setCheckIn(date)
+                          }}
+                          onCancel={() => {
+                            setIsopenCheckIn(false)
+                          }}
+                        />
+            {/* <TextInput placeholder="dd/mm/yyyy" style={[styles.Titext,{paddingVertical:0,height:30}]} /> */}
           </View>
           <View style={styles.TiView}>
             <Text style={styles.TiTitle}>Enter check out date</Text>
-            <TextInput placeholder="dd/mm/yyyy" style={styles.Titext} />
+            <TextInput placeholder="dd/mm/yyyy" style={[styles.Titext,{paddingVertical:0,height:30}]} />
           </View>
           <View style={styles.TiView}>
             <Text style={styles.TiTitle}>Enter required sq. feets</Text>
@@ -128,18 +190,22 @@ const WarehouseDetails = ({navigation,route}) => {
           </View>
 
           <View style={styles.CalView}>
+            <Text style={styles.CalText}>Total unbonded area</Text>
+            <Text style={styles.CalText1}>{details?.available_space} AED</Text>
+          </View>
+          <View style={styles.CalView1}>
             <Text style={styles.CalText}>Cost per sq. feet</Text>
-            <Text style={styles.CalText1}>35 aed</Text>
+            <Text style={styles.CalText1}>{details?.price}  AED</Text>
           </View>
           <View style={styles.CalView1}>
             <Text style={styles.CalText}>Cost for one day</Text>
-            <Text style={styles.CalText1}>200 aed</Text>
+            <Text style={styles.CalText1}>0 AED</Text>
           </View>
 
           <View style={styles.line}></View>
           <View style={styles.CalView1}>
             <Text style={styles.CalText1}>Total</Text>
-            <Text style={styles.CalText1}>235 aed</Text>
+            <Text style={styles.CalText1}>0 AED</Text>
           </View>
           <Text style={styles.CalCharge}>Includes taxes and charges</Text>
 
@@ -158,84 +224,25 @@ const WarehouseDetails = ({navigation,route}) => {
 
           <Text style={styles.textTitle}>Warehouse description</Text>
           <Text style={styles.textBody}>
-            Lorem ipsum dolor sit amet consectetur. Pulvinar amet cras pretium
-            dui. Et nibh cursus quis iaculis magna. Velit tristique mauris dolor
-            tortor. Morbi sit nec enim mauris nunc. Quam duis tincidunt
-            ullamcorper semper. Et pellentesque tempus at volutpat maecenas.
-            Venenatis netus dictum massa non. Nisi quis tortor ut sollicitudin
-            lectus libero. Suscipit quam facilisi cras est suscipit potenti
-            vulputate morbi duis. Et pellentesque tempus at volutpat maecenas.
-            Venenatis netus dictum massa non. Nisi quis tortor ut sollicitudin
-            lectus libero. Suscipit quam facilisi cras est suscipit potenti
-            vulputate morbi duis.
+            {details?.description}
           </Text>
 
           <Text style={styles.textTitle}>What it offers</Text>
 
+         {details?.properties?.length > 0 && details?.properties.map((v,i)=>{
+         return(
           <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>Accessibility for large trucks</Text>
-          </View>
-          <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>Surveillance cameras</Text>
-          </View>
-          <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>Temperature control features</Text>
-          </View>
-          <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>On-site parking</Text>
-          </View>
-          <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>High-speed internet</Text>
-          </View>
-          <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>Backup generators included</Text>
-          </View>
-          <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>Office area(s)</Text>
-          </View>
-          <View style={styles.flView}>
-            <Image
-              style={styles.flImg}
-              source={ImageConstant.location}
-              resizeMode="contain"
-            />
-            <Text style={styles.OfferText}>Fire alarms and extinguishers</Text>
-          </View>
+          <Image
+            style={styles.flImg}
+            source={ImageConstant.location}
+            resizeMode="contain"
+          />
+          <Text style={styles.OfferText}>{v?.description}</Text>
+        </View>
+         )
+         })}
+          
+
           <TouchableOpacity style={styles.BookButton} onPress={() => {
             navigation.navigate(appConstant.ChatScreen);
 
@@ -400,6 +407,8 @@ const WarehouseDetails = ({navigation,route}) => {
           </Text>
         </View>
       </ScrollView>
+      <PageLoader visible={isPageLoader} />
+
     </SafeAreaView>
   );
 };
@@ -473,7 +482,7 @@ const styles = StyleSheet.create({
     marginTop: '5%',
     marginBottom: '3%',
   },
-  flView: { flexDirection: 'row', marginTop: '5%', alignItems: 'center' },
+  flView: { flexDirection: 'row', marginTop: '5%', alignItems: 'center',paddingRight:20 },
   linearGradient: {
     flex: 1,
     paddingLeft: 15,
@@ -516,6 +525,8 @@ const styles = StyleSheet.create({
     color: 'gray',
     marginLeft: 15,
     marginTop: 5,
+    paddingVertical:0,
+    height:30
   },
   CalView: {
     flexDirection: 'row',
@@ -579,6 +590,7 @@ const styles = StyleSheet.create({
     color: colorConstant.textCOlor,
     fontWeight: '500',
     marginLeft: 15,
+    paddingRight:10,
   },
   reviewText: {
     fontSize: 22,
