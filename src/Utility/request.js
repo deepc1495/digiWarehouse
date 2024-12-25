@@ -16,7 +16,7 @@ const get = async (url, options = {}) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json', // Optional: Add if required
-          'Authorization':`${token}`,
+          'Authorization':`token ${token}`,
           ...(options.headers || {}),
            // Merge with existing headers if any
         },
@@ -45,10 +45,15 @@ const post = async (url, data, method = 'POST') => {
   return new Promise(async (resolve, reject) => {
     let baseURL = API_ENDPOINT + url;
     try {
-      const headers = {
+      const token = await AsyncStorage.getItem('token');
+
+      let headers = {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       };
+
+      headers["Authorization"]= `token ${token}`
+
       const response = await fetch(baseURL, {
         method: method,
         headers,
