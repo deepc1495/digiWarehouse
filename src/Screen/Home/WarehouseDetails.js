@@ -17,11 +17,12 @@ import ImageConstant from '../../constant/ImageConstant';
 import LinearGradient from 'react-native-linear-gradient';
 import ProgressBar from 'react-native-progress/Bar';
 import appConstant from '../../constant/appConstant';
-import {getAvailableSpace, getWareHouseDetails} from '../../Utility/api';
+import {getAddtoCart, getAvailableSpace, getFetchReview, getWareHouseDetails} from '../../Utility/api';
 import PageLoader from '../../Component/PageLoader';
 import {ImgMediaUrl, ImgUrl} from '../../Utility/request';
 import DatePicker from 'react-native-date-picker';
 import moment from 'moment';
+import Toast from 'react-native-toast-message';
 
 const WarehouseDetails = ({navigation, route}) => {
   const {id} = route.params;
@@ -70,17 +71,40 @@ const WarehouseDetails = ({navigation, route}) => {
       getDetails();
     }
   }, []);
-
+const [allDetails, setallDetails] = useState(null)
   const getDetails = async () => {
     const res = await getWareHouseDetails(id);
+    if(res?.data){
+      setallDetails(res?.data)
+    }
     if (res?.data?.warehouse) {
       setDetails(res?.data?.warehouse);
       setselectedImg(res?.data?.warehouse?.images?.[0]);
     } else {
       setDetails(null);
+      setisPageLoader(false);
+
     }
+    getDetailsReview()
+
+  };
+  const [reviewData, setReviewData] = useState(null)
+  const getDetailsReview = async () => {
+    const res = await getFetchReview(id);
+    console.log('resss',res)
+    if(res?.status){
+      setReviewData(res);
+
+    }else{
+      setReviewData(null);
+
+    }
+   
+
     setisPageLoader(false);
   };
+
+
   const getAvailableSpaceApi = async()=>{
     const url = `checkin=${moment(checkIn).format('YYYY-MM-DD')}&checkout=${moment(checkOut).format('YYYY-MM-DD')}&is_bonded=1`
     const res = await getAvailableSpace(id,url)
@@ -96,14 +120,31 @@ const WarehouseDetails = ({navigation, route}) => {
   }, [checkIn,checkOut])
 
   const getAddtoCartAPi = async()=>{
-    const data = {
-      "check_in_date":moment(checkIn).format('DD/MM/YYYY'),
-      "check_out_date":moment(checkOut).format('DD/MM/YYYY'),
-      "sq_feet":selectedValue,
-      "is_bonded":0
+    // const data = {
+    //   "check_in_date":moment(checkIn).format('DD/MM/YYYY'),
+    //   "check_out_date":moment(checkOut).format('DD/MM/YYYY'),
+    //   "sq_feet":selectedValue,
+    //   "is_bonded":0
+    // }
+    const formdata = new FormData();
+formdata.append("check_in_date", moment(checkIn).format('YYYY-MM-DD'));
+formdata.append("check_out_date", moment(checkOut).format('YYYY-MM-DD'));
+formdata.append("sq_feet",selectedValue.toString());
+formdata.append("is_bonded", "0");
+    const res = await getAddtoCart(id,formdata)
+    console.log('daaaaaaa',JSON.parse(res).status)
+    const ress = JSON.parse(res)
+    if(ress?.status){
+      Toast.show({
+        type:'success',
+        text1:ress?.message
+      })
+    }else{
+      Toast.show({
+        type:'error',
+        text1:ress?.message
+      })
     }
-    const res = await getAddtoCart(id,data)
-    console.log('daaaaaaa',res)
   }
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -132,8 +173,8 @@ const WarehouseDetails = ({navigation, route}) => {
           </Text> */}
 
           <View style={styles.subContainer}>
-            <Rating style={{}} imageSize={20} />
-            <Text style={styles.review}>272 Reviews</Text>
+            <Rating style={{}} imageSize={20} ratingCount={5} startingValue={allDetails?.Reviewsaverage} />
+            <Text style={styles.review}>{allDetails?.Reviews?.length} Reviews</Text>
           </View>
 
           {selectedImg?.image && (
@@ -299,8 +340,8 @@ const WarehouseDetails = ({navigation, route}) => {
             style={styles.BookButton}
             disabled={Number(selectedValue) * Number(details?.price) < 1}
             onPress={() => {
-              navigation.navigate(appConstant.AdditionalServices);
-              // getAddtoCartAPi()
+              // navigation.navigate(appConstant.AdditionalServices);
+              getAddtoCartAPi()
             }}>
             <Text style={styles.BookText}>Book now</Text>
           </TouchableOpacity>
@@ -332,10 +373,10 @@ const WarehouseDetails = ({navigation, route}) => {
             <Text style={styles.BookText}>Connect with Host</Text>
           </TouchableOpacity>
 
-          <Text style={styles.reviewText}>Reviews (272)</Text>
+          <Text style={styles.reviewText}>Reviews ({reviewData?.reviews?.length})</Text>
           <Text style={styles.reviewText1}>Overall rating</Text>
           <View style={styles.flView}>
-            <Text style={styles.ratingText}>4.1</Text>
+            <Text style={styles.ratingText}>{reviewData?.reviews_average??0}</Text>
             <Image
               source={ImageConstant.star}
               style={styles.starImg}
@@ -343,7 +384,7 @@ const WarehouseDetails = ({navigation, route}) => {
             />
           </View>
 
-          <View style={styles.flView}>
+          {/* <View style={styles.flView}>
             <View style={styles.ratingView}>
               <Text style={styles.ratviText}>5</Text>
               <Image
@@ -419,10 +460,12 @@ const WarehouseDetails = ({navigation, route}) => {
               style={styles.progress}
             />
             <Text style={styles.rattext}>40</Text>
-          </View>
-          <View style={styles.flView}>
+          </View> */}
+          {reviewData?.star_percentages?.map((v,i)=>{
+          return(
+            <View style={styles.flView}>
             <View style={styles.ratingView}>
-              <Text style={styles.ratviText}>1</Text>
+              <Text style={styles.ratviText}>{i+1}</Text>
               <Image
                 source={ImageConstant.star}
                 style={styles.ratimg}
@@ -430,63 +473,42 @@ const WarehouseDetails = ({navigation, route}) => {
               />
             </View>
             <ProgressBar
-              progress={0.01}
+              progress={v}
               width={250}
               height={20}
               color="#F2CC00"
               borderWidth={0}
               style={styles.progress}
             />
-            <Text style={styles.rattext}>10</Text>
+            <Text style={styles.rattext}>{v}</Text>
           </View>
+          )
+          })}
 
-          <View style={styles.UserView}>
-            <Image source={ImageConstant.user} style={styles.UserImg} />
-            <View style={styles.UserSubView}>
-              <View style={styles.USteView}>
-                <Text style={styles.ratviText}>Nicolas R</Text>
-                <Rating style={{marginLeft: '15%'}} imageSize={20} />
-              </View>
-              <Text style={styles.UserTextTiny}>Dubai • 1 weeks ago</Text>
+         
+
+        {reviewData?.reviews?.map((v,i)=>{
+          return(
+            <View>
+            <View style={styles.UserView}>
+               <Image source={ImageConstant.user} style={styles.UserImg} />
+               <View style={styles.UserSubView}>
+                 <View style={styles.USteView}>
+                   <Text style={styles.ratviText}>{v?.customer_name}</Text>
+                   <Rating style={{marginLeft: '15%'}} imageSize={20} startingValue={v?.rating??0} />
+                 </View>
+                 {/* <Text style={styles.UserTextTiny}>Dubai • 1 weeks ago</Text> */}
+               </View>
+             </View>
+   
+             <Text style={styles.UserBody}>
+               {v?.remark}
+             </Text>
             </View>
-          </View>
+          )
+        })}
 
-          <Text style={styles.UserBody}>
-            Lorem ipsum dolor sit amet consectetur. Velit aliquet lectus
-            ullamcorper ut lectus in est. Pulvinar nisl mauris elit tempus.
-          </Text>
-
-          <View style={styles.UserView}>
-            <Image source={ImageConstant.user} style={styles.UserImg} />
-            <View style={styles.UserSubView}>
-              <View style={styles.USteView}>
-                <Text style={styles.ratviText}>Nancy D</Text>
-                <Rating style={{marginLeft: '15%'}} imageSize={20} />
-              </View>
-              <Text style={styles.UserTextTiny}>Germany • 2 weeks ago</Text>
-            </View>
-          </View>
-
-          <Text style={styles.UserBody}>
-            Lorem ipsum dolor sit amet consectetur. Velit aliquet lectus
-            ullamcorper ut lectus in est. Pulvinar nisl mauris elit tempus.
-          </Text>
-
-          <View style={styles.UserView}>
-            <Image source={ImageConstant.user} style={styles.UserImg} />
-            <View style={styles.UserSubView}>
-              <View style={styles.USteView}>
-                <Text style={styles.ratviText}>Shen Z</Text>
-                <Rating style={{marginLeft: '15%'}} imageSize={20} />
-              </View>
-              <Text style={styles.UserTextTiny}>South Korea • 8 weeks ago</Text>
-            </View>
-          </View>
-
-          <Text style={styles.UserBody}>
-            Lorem ipsum dolor sit amet consectetur. Velit aliquet lectus
-            ullamcorper ut lectus in est. Pulvinar nisl mauris elit tempus.
-          </Text>
+         
         </View>
       </ScrollView>
       <PageLoader visible={isPageLoader} />

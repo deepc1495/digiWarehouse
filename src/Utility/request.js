@@ -1,14 +1,14 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import Toast from "react-native-toast-message";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 
 const API_ENDPOINT = 'https://log-booking.finloge.com/api';
-export const ImgUrl = `https://log-booking.finloge.com/`
-export const ImgMediaUrl = `https://log-manage.finloge.com/media/`
+export const ImgUrl = `https://log-booking.finloge.com/`;
+export const ImgMediaUrl = `https://log-manage.finloge.com/media/`;
 const get = async (url, options = {}) => {
   return new Promise(async (resolve, reject) => {
     let baseURL = API_ENDPOINT + url;
     const token = await AsyncStorage.getItem('token');
-   console.log('token',token)
+    console.log('token', token);
     try {
       console.log('url--', baseURL);
       let result = await fetch(baseURL, {
@@ -16,9 +16,9 @@ const get = async (url, options = {}) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json', // Optional: Add if required
-          'Authorization':`token ${token}`,
+          Authorization: `token ${token}`,
           ...(options.headers || {}),
-           // Merge with existing headers if any
+          // Merge with existing headers if any
         },
       });
       const response = await result.json();
@@ -33,12 +33,11 @@ const get = async (url, options = {}) => {
         });
       }
     } catch (error) {
-      console.log('testtttt',error)
+      console.log('testtttt', error);
       reject(error);
     }
   });
 };
-
 
 // Post method
 const post = async (url, data, method = 'POST') => {
@@ -46,24 +45,25 @@ const post = async (url, data, method = 'POST') => {
     let baseURL = API_ENDPOINT + url;
     try {
       const token = await AsyncStorage.getItem('token');
-
-      let headers = {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      };
-
-      headers["Authorization"]= `token ${token}`
+      console.log('dataaa', data);
+      const myHeaders = new Headers();
+      myHeaders.append('Authorization', 'ca6b795b-9ff9-41b0-9e84-60a4ffe74ab0');
+console.log('baseURL',baseURL)
+      // headers["Authorization"]= `ca6b795b-9ff9-41b0-9e84-60a4ffe74ab0`
 
       const response = await fetch(baseURL, {
         method: method,
-        headers,
+        headers:myHeaders,
         body: data,
+        redirect: "follow"
       });
-      const result = await response.json();
+      const result = await response.text();
+      console.log('result-',result)
       if (result.status || result.success) {
         resolve(result);
       } else {
-        resolve(result)
+        
+        resolve(result);
       }
     } catch (error) {
       reject(error);
@@ -87,7 +87,7 @@ const loginReq = async (url, data, method = 'POST') => {
       if (result.status || result.success) {
         resolve(result);
       } else {
-        resolve(result)
+        resolve(result);
       }
     } catch (error) {
       reject(error);
@@ -97,14 +97,14 @@ const loginReq = async (url, data, method = 'POST') => {
 
 // Delete method
 const Delete = async (url, data, method = 'POST') => {
-   return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     let baseURL = API_ENDPOINT + url;
     try {
       const headers = {
         Accept: '*/*',
         'Content-Type': 'multipart/form-data;',
       };
-     
+
       const response = await fetch(baseURL, {
         method: method,
         headers,
@@ -114,15 +114,14 @@ const Delete = async (url, data, method = 'POST') => {
       if (result.status || result.success) {
         resolve(result);
       } else {
-        resolve(result)
+        resolve(result);
       }
     } catch (error) {
-      console.error('error',error)
+      console.error('error', error);
       reject(error);
     }
   });
 };
-
 
 const payPostReq = async (url, data, method = 'POST') => {
   return new Promise(async (resolve, reject) => {
@@ -141,7 +140,7 @@ const payPostReq = async (url, data, method = 'POST') => {
       if (result.status || result.success) {
         resolve(result);
       } else {
-        resolve(result)
+        resolve(result);
       }
     } catch (error) {
       reject(error);
@@ -154,5 +153,5 @@ export default {
   post,
   Delete,
   payPostReq,
-  loginReq
+  loginReq,
 };
