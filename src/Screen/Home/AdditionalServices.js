@@ -14,15 +14,16 @@ import {ProgressSteps, ProgressStep} from 'react-native-progress-steps';
 import CustomProgressSteps from '../../Component/CustomProgressSteps';
 import {convertTypeAcquisitionFromJson} from 'typescript';
 
-const AdditionalServices = ({navigation}) => {
+const AdditionalServices = ({navigation,route}) => {
   const steps = ['Additional services', 'Review'];
   const buttonTextStyle = {
     color: '#393939',
   };
+const cartid = route.params?.cartid
 
   return (
     <SafeAreaView style={styles.container}>
-      <CustomProgressSteps steps={steps} navigation={navigation} />
+      <CustomProgressSteps steps={steps} navigation={navigation} cartid={cartid} />
     </SafeAreaView>
   );
 };

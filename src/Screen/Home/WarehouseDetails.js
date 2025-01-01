@@ -139,6 +139,9 @@ formdata.append("is_bonded", "0");
         type:'success',
         text1:ress?.message
       })
+      const cartid = ress?.cart_id
+   navigation.navigate(appConstant.AdditionalServices,{cartid});
+
     }else{
       Toast.show({
         type:'error',

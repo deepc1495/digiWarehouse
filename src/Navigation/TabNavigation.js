@@ -9,6 +9,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import AnimatedTabBar from '@gorhom/animated-tabbar';
 import colorConstant from '../constant/colorConstant';
 import NotificationScreen from '../Screen/Notification/NotificationScreen';
+import CartListScreen from '../Screen/Booking/CartListScreen';
 
 const TabNavigation = () => {
   const Tabs = AnimatedTabBarNavigator();
@@ -90,8 +91,9 @@ const TabNavigation = () => {
           }}
         />
         <Tabs.Screen
-          name="language"
-          component={ExplorServices}
+          name="cart"
+          // component={ExplorServices}
+          component={CartListScreen}
           options={{
             tabBarIcon: ({focused, color, size}) => (
               <Image

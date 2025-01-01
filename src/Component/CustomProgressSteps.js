@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -13,17 +13,46 @@ import {
 import colorConstant from '../constant/colorConstant';
 import ImageConstant from '../constant/ImageConstant';
 import appConstant from '../constant/appConstant';
+import { orderPlaceApi, getFinalReview } from '../Utility/api';
+import moment from 'moment';
+import Toast from 'react-native-toast-message';
 
 const {width} = Dimensions.get('window');
 
-const CustomProgressSteps = ({steps,navigation}) => {
+const CustomProgressSteps = ({steps,navigation,cartid}) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [reviewData, setreviewData] = useState(null)
+console.log('cartid',cartid)
 
-  const moveNext = () => {
+useEffect(() => {
+ getReviewData()
+}, [cartid])
+
+const getReviewData = async()=>{
+  const res = await getFinalReview(cartid)
+  console.log('ress---',res.status)
+  if(res?.status){
+    setreviewData(res?.data)
+  }
+}
+
+  const moveNext = async() => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
     }else{
+      const ress = await orderPlaceApi(cartid)
+      const res = JSON.parse(ress)
+      console.log('resss',res)
+      console.log('resss',res.status)
+      if(res?.status){
+        Toast.show({
+          show:'success',
+          text1:res?.message
+        })
+        const bookingid = res?.booking_id
       navigation.navigate(appConstant.BookingHistory)
+
+      }
     }
   };
 
@@ -333,7 +362,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                     color: colorConstant.textCOlor,
                     fontWeight: '500',
                   }}>
-                  $120.00
+                  ${reviewData?.per_day_charge}
                 </Text>
               </View>
 
@@ -357,7 +386,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                     color: colorConstant.textCOlor,
                     fontWeight: '500',
                   }}>
-                  7
+                  {reviewData?.no_of_days}
                 </Text>
               </View>
               <View
@@ -403,7 +432,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                     color: colorConstant.textCOlor,
                     fontWeight: '500',
                   }}>
-                  $55.00
+                  ${reviewData?.taxes_and_fee}
                 </Text>
               </View>
 
@@ -427,7 +456,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                     color: colorConstant.textCOlor,
                     fontWeight: '500',
                   }}>
-                  $895.00
+                  ${reviewData?.total_price}
                 </Text>
               </View>
               <Text style={{fontSize: 14, color: 'gray', fontWeight: '300'}}>
@@ -473,7 +502,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                         color: colorConstant.textCOlor,
                         fontWeight: '500',
                       }}>
-                      Warehouse in sharjah - Premium Deal
+                      {reviewData?.warehouse?.name}
                     </Text>
                     <Text
                       style={{
@@ -482,7 +511,8 @@ const CustomProgressSteps = ({steps,navigation}) => {
                         fontWeight: '400',
                         marginTop: '3%',
                       }}>
-                      lorem Ipsum • lorem Ipsum
+                       {reviewData?.warehouse?.description}
+
                     </Text>
 
                     <Text
@@ -492,7 +522,8 @@ const CustomProgressSteps = ({steps,navigation}) => {
                         fontWeight: '400',
                         marginTop: '3%',
                       }}>
-                      $120
+                      ${reviewData?.per_day_charge}
+                    
                       <Text
                         style={{
                           fontSize: 14,
@@ -542,7 +573,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                         color: colorConstant.textCOlor,
                         fontWeight: '500',
                       }}>
-                      30th May 2024
+                      {moment(reviewData?.checkin).format('Do MMM YYYY')}
                     </Text>
                   </View>
                   <Image
@@ -565,8 +596,8 @@ const CustomProgressSteps = ({steps,navigation}) => {
                         color: colorConstant.textCOlor,
                         fontWeight: '500',
                       }}>
-                      5th June 2024
-                    </Text>
+                      {moment(reviewData?.checkout).format('Do MMM YYYY')}
+                      </Text>
                   </View>
 
                   <Image
@@ -613,7 +644,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                       color: colorConstant.textCOlor,
                       fontWeight: '500',
                     }}>
-                    $120.00
+                    ${reviewData?.per_day_charge}
                   </Text>
                 </View>
 
@@ -637,7 +668,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                       color: colorConstant.textCOlor,
                       fontWeight: '500',
                     }}>
-                    7
+                    {reviewData?.no_of_days??0}
                   </Text>
                 </View>
                 <View
@@ -683,7 +714,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                       color: colorConstant.textCOlor,
                       fontWeight: '500',
                     }}>
-                    $55.00
+                    ${reviewData?.taxes_and_fee}
                   </Text>
                 </View>
 
@@ -707,7 +738,7 @@ const CustomProgressSteps = ({steps,navigation}) => {
                       color: colorConstant.textCOlor,
                       fontWeight: '500',
                     }}>
-                    $895.00
+                    ${reviewData?.total_price}
                   </Text>
                 </View>
                 <Text style={{fontSize: 14, color: 'gray', fontWeight: '300'}}>

@@ -16,7 +16,7 @@ const get = async (url, options = {}) => {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json', // Optional: Add if required
-          Authorization: `token ${token}`,
+          Authorization: `${token}`,
           ...(options.headers || {}),
           // Merge with existing headers if any
         },
@@ -40,7 +40,7 @@ const get = async (url, options = {}) => {
 };
 
 // Post method
-const post = async (url, data, method = 'POST') => {
+const post = async (url, data={}, method = 'POST') => {
   return new Promise(async (resolve, reject) => {
     let baseURL = API_ENDPOINT + url;
     try {
