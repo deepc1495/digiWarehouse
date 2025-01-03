@@ -331,13 +331,13 @@ formdata.append("is_bonded", "0");
           </View>
           <Text style={styles.CalCharge}>Includes taxes and charges</Text>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.AddButton}
             onPress={() => {
               navigation.navigate(appConstant.EnquiryList);
             }}>
             <Text style={styles.AddText}>Add to wishlist</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             style={styles.BookButton}

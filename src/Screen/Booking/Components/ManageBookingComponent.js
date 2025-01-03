@@ -9,11 +9,12 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import colorConstant from "../../../constant/colorConstant";
+import moment from "moment";
 
-const ManageBookingComponent = (props) => {
+const ManageBookingComponent = ({bookingData}) => {
     const [sqFeet, setSqFeet] = useState("50");
-    const [startDate, setStartDate] = useState("30th May 2024");
-    const [endDate, setEndDate] = useState("5th June 2024");
+    const [startDate, setStartDate] = useState(moment(bookingData?.checkin).format('Do MMM YYYY'));
+    const [endDate, setEndDate] = useState(moment(bookingData?.checkout).format('Do MMM YYYY'));
 
     const totalArea = 2000.0;
     const costPerSqFeet = 10;

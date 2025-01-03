@@ -55,10 +55,15 @@ const LandingScreen = props => {
 
   const [selectedRestrictions, setSelectedRestrictions] = useState([]);
   const [selectedCommodities, setSelectedCommodities] = useState([]);
-
+const params = props.route.params
+console.log('params',params)
   useEffect(() => {
     getCategories()
-    getWareHouseListData()
+  if(!params?.filterUrl){
+      getWareHouseListData()
+
+  }
+    
   }, [])
 
   const getCategories = async () => {
@@ -104,7 +109,7 @@ const LandingScreen = props => {
     setisPageLoader(false)
 
   }
-
+console.log('rrrr',warehouseData[0])
   const onpressMoreData = async () => {
     let urls = `?page=${currentPage + 1}`;
     if (cargoType) {
@@ -166,7 +171,10 @@ const LandingScreen = props => {
   }
 
   useEffect(() => {
-    onPressSearch()
+    if(id?.length > 0){
+
+      onPressSearch()
+    }
 
   }, [id])
 
@@ -191,6 +199,15 @@ const LandingScreen = props => {
     onPressSearch()
     setModalFilterVisible(false)
   }
+
+  useEffect(() => {
+    if(params?.filterUrl){
+      const urls =`?${params?.filterUrl}`
+       getWareHouseListData(urls)
+ 
+     }
+     
+  }, [params?.filterUrl])
 
   return (
     <View style={styles.mainContainer}>
@@ -312,7 +329,7 @@ const LandingScreen = props => {
                   style={styles.cardprimgicon}
                   resizeMode="contain"
                 />
-                <Text style={[styles.cardTitle, { marginLeft: 3 }]}>{item.warehouse_address_line1}</Text>
+                <Text style={[styles.cardTitle, { marginLeft: 3 }]}>{item.emirate_type?.name}</Text>
               </View>
               {/* <Text style={styles.cardDistance}>{item.location}</Text> */}
               <View style={styles.cardprview}>

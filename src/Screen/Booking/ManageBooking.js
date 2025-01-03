@@ -9,14 +9,15 @@ import {
 } from "react-native";
 import colorConstant from "../../constant/colorConstant";
 import ManageBookingComponent from "./Components/ManageBookingComponent";
+import moment from "moment";
 
 const ManageBooking = (props) => {
     const [openSection, setOpenSection] = useState(null);
-
+const bookingData = props.route.params.bookingData
     const toggleSection = (section) => {
         setOpenSection(openSection === section ? null : section);
     };
-
+console.log('bookingData',bookingData)
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -53,11 +54,11 @@ const ManageBooking = (props) => {
                         <Image source={openSection === "bookingDetails" ? require('../../Img/icon/upArrow.png') : require('../../Img/icon/downArrow.png')} style={{ width: 18, height: 10 }} />
                     </TouchableOpacity>
                     {openSection === "bookingDetails" && (
-                        <View style={styles.sectionContent}>
-                            <DetailRow label="Date Created" value="2024-11-14 18:15:53" />
-                            <DetailRow label="Start Date" value="2024-11-14" />
-                            <DetailRow label="End Date" value="2024-11-15" isLine={false} />
-                        </View>
+                         <View style={styles.sectionContent}>
+                                                    {bookingData?.created_at && <DetailRow label="Date Created" value={moment(bookingData?.created_at).format('YYYY-MM-DD')} />}
+                                                    {bookingData?.checkin && <DetailRow label="Start Date" value={moment(bookingData?.checkin).format('YYYY-MM-DD')} />}
+                                                    {bookingData?.checkin && <DetailRow label="End Date" value={moment(bookingData?.checkout).format('YYYY-MM-DD')} isLine={false} />}
+                                                </View>
                     )}
 
                 </View>
@@ -76,16 +77,16 @@ const ManageBooking = (props) => {
                     </TouchableOpacity>
                     {openSection === "warehouseDetails" && (
                         <View style={styles.sectionContent}>
-                            <DetailRow label="Warehouse" value="Dubai Warehouse" />
-                            <DetailRow label="Sq Feet" value="50" />
-                            <DetailRow label="Price" value="AED 400.00" />
-                            <DetailRow label="Total days" value="1" />
-                            <DetailRow label="Total" value="AED 500.00" isLine={false}/>
+                            <DetailRow label="Warehouse" value={bookingData?.warehouse?.name} />
+                            <DetailRow label="Sq Feet" value={bookingData?.sq_feet} />
+                            <DetailRow label="Price" value={`AED ${bookingData?.warehouse_price}` }/>
+                            <DetailRow label="Total days" value={bookingData?.no_of_days} />
+                            <DetailRow label="Total" value={`AED ${bookingData?.warehouse?.total_price}`} isLine={false}/>
                         </View>
                     )}
                 </View>
 
-                <ManageBookingComponent/>
+                <ManageBookingComponent bookingData={bookingData}/>
 
 
             </ScrollView>

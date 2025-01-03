@@ -10,47 +10,12 @@ import AnimatedTabBar from '@gorhom/animated-tabbar';
 import colorConstant from '../constant/colorConstant';
 import NotificationScreen from '../Screen/Notification/NotificationScreen';
 import CartListScreen from '../Screen/Booking/CartListScreen';
+import BookingHistory from '../Screen/Booking/BookingHistory';
 
 const TabNavigation = () => {
   const Tabs = AnimatedTabBarNavigator();
   // const Tabs = createBottomTabNavigator();
-  const Home = () => {};
-  const Home1 = () => {};
-  const Home2 = () => {};
-  const Home3 = () => {};
-  const Home4 = () => {};
-
-  const tabs = {
-    Home: {
-      // < Screen name
-      labelStyle: {
-        color: '#5B37B7',
-      },
-      icon: {
-        activeColor: 'rgba(91,55,183,1)',
-        inactiveColor: 'rgba(0,0,0,1)',
-      },
-      background: {
-        activeColor: colorConstant.colorPrimary,
-        inactiveColor: 'rgba(223,215,243,0)',
-      },
-    },
-    Profile: {
-      // < Screen name
-      labelStyle: {
-        color: '#1194AA',
-      },
-      icon: {
-        activeColor: 'rgba(17,148,170,1)',
-        inactiveColor: 'rgba(0,0,0,1)',
-      },
-      background: {
-        activeColor: 'rgba(207,235,239,1)',
-        inactiveColor: 'rgba(207,235,239,0)',
-      },
-    },
-  };
-
+ const Home4 = ()=>{}
   return (
     <View style={{flex: 1}}>
       <Tabs.Navigator
@@ -69,7 +34,8 @@ const TabNavigation = () => {
         })}>
         <Tabs.Screen
           name="setting"
-          component={AdditionalServices}
+          // component={AdditionalServices}
+          component={CartListScreen}
           options={{
             tabBarIcon: ({focused, color, size}) => (
               <Image
@@ -91,9 +57,9 @@ const TabNavigation = () => {
           }}
         />
         <Tabs.Screen
-          name="cart"
-          // component={ExplorServices}
-          component={CartListScreen}
+          name="Service"
+          component={ExplorServices}
+          // component={CartListScreen}
           options={{
             tabBarIcon: ({focused, color, size}) => (
               <Image

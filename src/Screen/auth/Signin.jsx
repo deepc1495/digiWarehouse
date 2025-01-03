@@ -56,10 +56,9 @@ const SignIn = ({ navigation }) => {
           type: "success",
           text1: response?.message,
         });
-        // const data = response.data
+        const data = response?.data
         // await AsyncStorage.setItem('userId', response.data.id);
-        // await AsyncStorage.setItem('userData',JSON.stringify(data));
-
+        await AsyncStorage.setItem('userData',JSON.stringify(data));
         // await AsyncStorage.setItem('token', response.token);
         await AsyncStorage.setItem('token', 'ca6b795b-9ff9-41b0-9e84-60a4ffe74ab0');
         // const walletAddress = response.data.wallet_details?.wallet_address;

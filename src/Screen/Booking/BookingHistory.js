@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,65 +7,130 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
-} from "react-native";
-import colorConstant from "../../constant/colorConstant";
-import appConstant from "../../constant/appConstant";
+  Dimensions,
+  ActivityIndicator,
+} from 'react-native';
+import colorConstant from '../../constant/colorConstant';
+import appConstant from '../../constant/appConstant';
 // import { Picker } from "@react-native-picker/picker";
 import DropDownPicker from 'react-native-dropdown-picker';
+import {getOrderListApi} from '../../Utility/api';
+import moment from 'moment';
+import {ImgMediaUrl} from '../../Utility/request';
 
-const BookingHistory = (props) => {
-  const [selectedTab, setSelectedTab] = useState("Completed Booking");
-  const [selectedFilter, setSelectedFilter] = useState("All");
+const BookingHistory = props => {
+  const [selectedTab, setSelectedTab] = useState(1);
+  const [selectedFilter, setSelectedFilter] = useState(2);
 
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([
-    { label: "All", value: "all" },
-    { label: "Confirmed", value: "confirmed" },
-    { label: "Under Process", value: "under_process" },
+    {label: 'All', value: 2},
+    {label: 'Confirmed', value: 1},
+    {label: 'Under Process', value: 0},
   ]);
 
   const bookings = [
     {
       id: 1,
-      status: "Under Process",
-      statusColor: "#F5B301",
-      bookingNo: "#Booking-19",
-      name: "sample21_",
-      startDate: "2024-11-16",
-      endDate: "2024-11-17",
-      amount: "AED 63270.00",
-      img: require('../../Img/house1.png')
+      status: 'Under Process',
+      statusColor: '#F5B301',
+      bookingNo: '#Booking-19',
+      name: 'sample21_',
+      startDate: '2024-11-16',
+      endDate: '2024-11-17',
+      amount: 'AED 63270.00',
+      img: require('../../Img/house1.png'),
     },
     {
       id: 2,
-      status: "Confirmed",
-      statusColor: "#30A644",
-      bookingNo: "#Booking-19",
-      name: "sample21_",
-      startDate: "2024-11-16",
-      endDate: "2024-11-17",
-      amount: "AED 63270.00",
-      img: require('../../Img/house1.png')
-
+      status: 'Confirmed',
+      statusColor: '#30A644',
+      bookingNo: '#Booking-19',
+      name: 'sample21_',
+      startDate: '2024-11-16',
+      endDate: '2024-11-17',
+      amount: 'AED 63270.00',
+      img: require('../../Img/house1.png'),
     },
     {
       id: 3,
-      status: "Under Process",
-      statusColor: "#F5B301",
-      bookingNo: "#Booking-19",
-      name: "sample21_",
-      startDate: "2024-11-16",
-      endDate: "2024-11-17",
-      amount: "AED 63270.00",
-      img: require('../../Img/house1.png')
-
+      status: 'Under Process',
+      statusColor: '#F5B301',
+      bookingNo: '#Booking-19',
+      name: 'sample21_',
+      startDate: '2024-11-16',
+      endDate: '2024-11-17',
+      amount: 'AED 63270.00',
+      img: require('../../Img/house1.png'),
     },
   ];
+  const [upcommingData, setUpcommingData] = useState(null);
+  const [complitedData, setComplitedData] = useState(null);
+  const [listData, setlistData] = useState(null);
+  const [isLoading, setisLoading] = useState(true);
+  const getBookingList = async () => {
+    const res = await getOrderListApi();
+    console.log('ress---', res.status);
+    if (res?.status) {
+      console.log('ress', res);
+      setUpcommingData(res?.upcoming);
+      setComplitedData(res?.completed);
+      if (selectedTab === 1) {
+        setlistData(res?.upcoming?.data);
+      } else {
+        setlistData(res?.completed?.data);
+      }
+    }
+    setisLoading(false)
+  };
+
+  console.log('list--', listData);
+  useEffect(() => {
+    getBookingList();
+  }, []);
+
+  useEffect(() => {
+    if (upcommingData?.data?.length > 0 || complitedData?.data?.length > 0) {
+      if (value === 2) {
+        if (selectedTab === 1) {
+          setlistData(upcommingData?.data);
+        } else {
+          setlistData(complitedData?.data);
+        }
+      } else if (value === 1) {
+        if (selectedTab === 1) {
+          const filteredData = upcommingData?.data.filter(
+            item => item.cart_status === 1
+          );
+
+          setlistData(filteredData);
+        } else {
+          const filteredData = complitedData?.data.filter(
+            item => item.cart_status === 1
+          );
+          setlistData(filteredData);
+        }
+      }else if (value === 0) {
+        if (selectedTab === 1) {
+          const filteredData = upcommingData?.data?.filter(
+            item => item.cart_status === 0,
+          );
+
+          setlistData(filteredData);
+        } else {
+          const filteredData = complitedData?.data?.filter(
+            item => item.cart_status === 0,
+          );
+          setlistData(filteredData);
+        }
+      }
+    }
+  }, [value, selectedTab,upcommingData,complitedData]);
+
 
   return (
     <SafeAreaView style={styles.container}>
-
       <View style={styles.container1}>
         <TouchableOpacity
           style={styles.container1Touchable}
@@ -78,62 +143,31 @@ const BookingHistory = (props) => {
             resizeMode="contain"
           />
         </TouchableOpacity>
-        <Text style={styles.container1Text1}>
-          Booking History
-        </Text>
+        <Text style={styles.container1Text1}>Booking History</Text>
       </View>
 
       {/* Tabs */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[
-            styles.tab,
-            selectedTab === "Upcoming Booking" && styles.activeTab,
-          ]}
-          onPress={() => setSelectedTab("Upcoming Booking")}
-        >
+          style={[styles.tab, selectedTab === 1 && styles.activeTab]}
+          onPress={() => setSelectedTab(1)}>
           <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Upcoming Booking" && styles.activeTabText,
-            ]}
-          >
+            style={[styles.tabText, selectedTab === 1 && styles.activeTabText]}>
             Upcoming Booking
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.tab,
-            selectedTab === "Completed Booking" && styles.activeTab,
-          ]}
-          onPress={() => setSelectedTab("Completed Booking")}
-        >
+          style={[styles.tab, selectedTab === 2 && styles.activeTab]}
+          onPress={() => setSelectedTab(2)}>
           <Text
-            style={[
-              styles.tabText,
-              selectedTab === "Completed Booking" && styles.activeTabText,
-            ]}
-          >
+            style={[styles.tabText, selectedTab === 2 && styles.activeTabText]}>
             Completed Booking
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* Filter Dropdown */}
-      {/* <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={selectedFilter}
-          onValueChange={(itemValue) => setSelectedFilter(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="All" value="All" />
-          <Picker.Item label="Confirmed" value="Confirmed" />
-          <Picker.Item label="Under Process" value="Under Process" />
-        </Picker>
-      </View> */}
-
-<View style={styles.dropdownContainer}>
+      <View style={styles.dropdownContainer}>
         <DropDownPicker
           open={open}
           value={value}
@@ -143,7 +177,7 @@ const BookingHistory = (props) => {
           setItems={setItems}
           placeholder="All"
           style={styles.dropdown}
-          arrowIconStyle={{ tintColor: "rgba(25, 30, 59, 0.30)" }} // Set dropdown icon color to red
+          arrowIconStyle={{tintColor: 'rgba(25, 30, 59, 0.30)'}} // Set dropdown icon color to red
           dropDownContainerStyle={styles.dropdownList}
           textStyle={styles.dropdownText}
         />
@@ -151,34 +185,60 @@ const BookingHistory = (props) => {
 
       {/* Booking List */}
       <ScrollView style={styles.bookingList}>
-        {bookings.map((booking) => (
-          <TouchableOpacity key={booking.id} style={styles.card} onPress={() => {
-            props.navigation.navigate(appConstant.BookingDetails)
-          }}>
-            <Image
-              source={booking?.img}
-              style={styles.cardImage}
-            />
-            <View style={styles.cardDetails}>
-              <Text style={[styles.status, { color: booking.statusColor }]}>
-                {booking.status}
-              </Text>
-              <Text style={styles.bookingNo}>Booking no: {booking.bookingNo}</Text>
-              <Text style={styles.name}>{booking.name}</Text>
-              <Text style={styles.date}>
-                Start Date: <Text style={{ fontWeight: '500' }}> {booking.startDate}</Text>
-              </Text>
-              <Text style={styles.date}>
-
-                End Date:  <Text style={{ fontWeight: '500' }}> {booking.endDate}</Text>
-              </Text>
-              <Text style={styles.date}>
-                Total amount: <Text style={styles.amount}>{booking.amount}</Text>
-
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {listData?.map(booking => {
+          console.log('image', ImgMediaUrl + booking?.warehouse?.image?.image);
+          const img = ImgMediaUrl + booking?.warehouse?.image?.image;
+          return (
+            <TouchableOpacity
+              key={booking.id}
+              style={styles.card}
+              onPress={() => {
+                props.navigation.navigate(appConstant.BookingDetails,{id:booking?.id});
+              }}>
+              <Image source={{uri: img}} style={styles.cardImage} />
+              <View style={styles.cardDetails}>
+                <Text
+                  style={[
+                    styles.status,
+                    {color: booking.cart_status === 0 ? '#F5B301' : '#30A644'},
+                  ]}>
+                  {booking.cart_status === 0 ? 'Under Process' : 'Confirmed'}
+                </Text>
+                <Text style={styles.bookingNo}>
+                  Booking no: {booking.order_no}
+                </Text>
+                <Text style={styles.name}>{booking?.warehouse?.name}</Text>
+                <Text style={styles.date}>
+                  Start Date:{' '}
+                  <Text style={{fontWeight: '500'}}>
+                    {' '}
+                    {moment(booking?.checkin).format('YYYY-MM-DD')}
+                  </Text>
+                </Text>
+                <Text style={styles.date}>
+                  End Date:{' '}
+                  <Text style={{fontWeight: '500'}}>
+                    {moment(booking?.checkout).format('YYYY-MM-DD')}
+                  </Text>
+                </Text>
+                <Text style={styles.date}>
+                  Total amount:{' '}
+                  <Text style={styles.amount}>{booking.total_price}</Text>
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+        {!isLoading && listData?.length === 0 && 
+        <View style={{display:'flex',alignItems:'center',justifyContent:'center',height:400}}>
+          <Text>No Booking Found</Text>
+        </View>
+        }
+        {isLoading &&
+        <View style={{display:'flex',alignItems:'center',justifyContent:'center',height:400}}>
+          <ActivityIndicator size={30} color='#000'/>
+        </View>
+        }
       </ScrollView>
     </SafeAreaView>
   );
@@ -187,9 +247,8 @@ const BookingHistory = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
   },
-
 
   container1: {
     width: '90%',
@@ -197,7 +256,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: '5%',
     alignItems: 'center',
-    marginBottom: 15
+    marginBottom: 15,
   },
   container1Touchable: {
     width: 25,
@@ -207,21 +266,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 20,
   },
-  touchImg: { width: 10, height: 10 },
-  container1Text1: { marginLeft: 10, color: '#000', fontSize: 15 },
+  touchImg: {width: 10, height: 10},
+  container1Text1: {marginLeft: 10, color: '#000', fontSize: 15},
 
   header: {
     marginTop: 10,
     marginBottom: 10,
-    alignItems: "center",
+    alignItems: 'center',
   },
   headerTime: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     marginBottom: 10,
   },
@@ -230,13 +289,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginLeft: 8,
   },
   tabContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginTop: 5,
-    justifyContent: "center",
+    justifyContent: 'center',
     borderWidth: 1,
     borderRadius: 5,
     borderColor: colorConstant.colorPrimary,
@@ -244,15 +303,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   tab: {
-    paddingVertical: 10, flex: 1,
+    paddingVertical: 10,
+    flex: 1,
     alignItems: 'center',
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   activeTab: {
     borderColor: colorConstant.colorPrimary,
     flex: 1,
     backgroundColor: colorConstant?.colorPrimary,
-    borderRadius: 5
+    borderRadius: 5,
   },
   tabText: {
     fontSize: 16,
@@ -260,30 +320,30 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: colorConstant.white,
-    fontWeight: "400",
+    fontWeight: '400',
   },
   pickerContainer: {
     marginHorizontal: 16,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: "#E5E5E5",
+    borderColor: '#E5E5E5',
     borderRadius: 8,
   },
   picker: {
     height: 50,
-    width: "100%",
+    width: '100%',
   },
   bookingList: {
     marginTop: 10,
     paddingHorizontal: 16,
   },
   card: {
-    flexDirection: "row",
-    backgroundColor: "#FFF",
+    flexDirection: 'row',
+    backgroundColor: '#FFF',
     borderRadius: 10,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: {width: 0, height: 1},
     elevation: 2,
     marginBottom: 16,
     padding: 10,
@@ -296,49 +356,48 @@ const styles = StyleSheet.create({
   cardDetails: {
     marginLeft: 10,
     flex: 1,
-    justifyContent: "space-evenly",
+    justifyContent: 'space-evenly',
   },
   status: {
     fontSize: 12,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   bookingNo: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#222",
+    fontWeight: '500',
+    color: '#222',
   },
   name: {
     fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
+    fontWeight: 'bold',
+    color: '#000',
   },
   date: {
     fontSize: 12,
-    color: "#191E3B",
+    color: '#191E3B',
   },
   amount: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
+    fontWeight: 'bold',
+    color: '#000',
   },
 
   dropdownContainer: {
     marginHorizontal: 15,
     marginVertical: 10,
     zIndex: 1,
-    width:'50%',
-    marginBottom:20
+    width: '50%',
+    marginBottom: 20,
   },
   dropdown: {
-    borderColor: "rgba(25, 30, 59, 0.30)",
+    borderColor: 'rgba(25, 30, 59, 0.30)',
     borderRadius: 8,
   },
   dropdownList: {
-    borderColor: "rgba(25, 30, 59, 0.30)",
+    borderColor: 'rgba(25, 30, 59, 0.30)',
   },
   dropdownText: {
     fontSize: 16,
-
   },
 });
 

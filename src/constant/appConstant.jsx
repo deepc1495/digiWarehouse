@@ -10,4 +10,5 @@ export default {
   BookingDetails:"BookingDetails",
   ManageBooking:"ManageBooking",
   ChatScreen:"ChatScreen",
+  ExplorServices:"ExplorServices",
 };

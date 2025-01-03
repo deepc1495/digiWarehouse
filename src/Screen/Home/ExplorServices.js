@@ -15,8 +15,9 @@ import ImageConstant from '../../constant/ImageConstant';
 import { getExplore } from '../../Utility/api';
 import PageLoader from '../../Component/PageLoader';
 import { ImgUrl } from '../../Utility/request';
+import appConstant from '../../constant/appConstant';
 
-const ExplorServices = () => {
+const ExplorServices = ({navigation}) => {
   const locationData = [
     {id: 1, name: 'DUBAI', image: require('../../Img/toplocation/dubai.png')},
     {
@@ -153,7 +154,7 @@ const getExploreData = async () => {
             data={exploreData?.emirates || []}
             renderItem={({item, index}) => {
               return (
-                <View
+                <TouchableOpacity onPress={()=>{navigation.navigate(appConstant.LandingScreen,{filterUrl:`emirate=${item?.id}`})}}
                   style={[styles.flatView, {marginLeft: index == 0 ? 0 : 20}]}>
                   <Image source={{uri:ImgUrl+item?.image}} style={styles.flimg} />
                   <View style={styles.flinview}>
@@ -166,7 +167,7 @@ const getExploreData = async () => {
                       />
                     </View>
                   </View>
-                </View>
+                </TouchableOpacity>
               );
             }}
           />

@@ -20,7 +20,7 @@ import Toast from 'react-native-toast-message';
 const {width} = Dimensions.get('window');
 
 const CustomProgressSteps = ({steps,navigation,cartid}) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
   const [reviewData, setreviewData] = useState(null)
 console.log('cartid',cartid)
 
@@ -70,7 +70,7 @@ const getReviewData = async()=>{
   return (
     <View style={styles.container}>
       <View>
-        <View style={styles.stepContainer}>
+       {steps?.length > 0 && <View style={styles.stepContainer}>
           {steps.map((step, index) => (
             <View
               key={index} // Ensure a unique key for each iteration
@@ -117,7 +117,7 @@ const getReviewData = async()=>{
               </Text>
             </View>
           ))}
-        </View>
+        </View>}
         {/* <View style={styles.stepContainer}>
           {steps.map((step, index) => (
             <View key={index} style={styles.stepWrapper}>
@@ -468,15 +468,26 @@ const getReviewData = async()=>{
           <ScrollView>
             <View style={{flex: 1, backgroundColor: colorConstant.white}}>
               <View style={{width: '90%', alignSelf: 'center'}}>
+                <View style={{display:'flex',alignItems:'center',flexDirection:'row',marginTop: '5%',columnGap:10}}>
+           <TouchableOpacity onPress={()=>{navigation.goBack()}}>
+              <Image
+            source={ImageConstant.back}
+            style={{width: 15, height: 15}}
+            tintColor={colorConstant.textCOlor}
+            resizeMode="contain"
+          />
+
+           </TouchableOpacity>
                 <Text
                   style={{
-                    marginTop: '5%',
+                    
                     fontSize: 22,
                     color: colorConstant.textCOlor,
                     fontWeight: '500',
                   }}>
                   Warehouse details
                 </Text>
+                </View>
 
                 <View
                   style={{
@@ -522,7 +533,7 @@ const getReviewData = async()=>{
                         fontWeight: '400',
                         marginTop: '3%',
                       }}>
-                      ${reviewData?.per_day_charge}
+                      ${reviewData?.warehouse?.price}
                     
                       <Text
                         style={{
@@ -671,7 +682,7 @@ const getReviewData = async()=>{
                     {reviewData?.no_of_days??0}
                   </Text>
                 </View>
-                <View
+                {/* <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -693,7 +704,7 @@ const getReviewData = async()=>{
                     }}>
                     $840.00
                   </Text>
-                </View>
+                </View> */}
                 <View
                   style={{
                     flexDirection: 'row',
@@ -759,7 +770,7 @@ const getReviewData = async()=>{
           justifyContent: 'space-around',
           marginTop: '5%',
         }}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             width: 120,
             height: 58,
@@ -786,13 +797,13 @@ const getReviewData = async()=>{
             }}>
             Back
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
           style={{
-            width: 120,
+            // width: ,
             height: 58,
             borderRadius: 8,
-
+            paddingHorizontal:20,
             alignItems: 'center',
             justifyContent: 'center',
             backgroundColor: colorConstant.colorPrimary,
@@ -806,14 +817,15 @@ const getReviewData = async()=>{
               fontWeight: '600',
               marginRight: 5,
             }}>
-            {currentStep === steps.length-1 ? 'Confirm':'Next'}
+            {/* {currentStep === steps.length-1 ? 'Confirm':'Next'} */}
+            {currentStep === steps.length-1 ? 'Confirm':'Pay for Service'}
           </Text>
-          <Image
+          {/* <Image
             source={ImageConstant.next}
             style={{width: 15, height: 15}}
             tintColor={colorConstant.white}
             resizeMode="contain"
-          />
+          /> */}
         </TouchableOpacity>
       </View>
     </View>

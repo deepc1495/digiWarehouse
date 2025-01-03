@@ -22,7 +22,6 @@ const get = async (url, options = {}) => {
         },
       });
       const response = await result.json();
-      console.log('resss', response);
       if (result.ok) {
         resolve(response);
       } else {
